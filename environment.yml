@@ -29,4 +29,9 @@ dependencies:
     - geemap
     - earthengine-api
     - plotly-express
-    - kaleido 
+    - kaleido
+    - pyhive
+    - thrift
+    - thrift-sasl
+    - impyla
+    - python-dotenv 

@@ -9,7 +9,13 @@ from typing import Dict, List, Optional, Tuple, Union
 import logging
 from datetime import datetime, timedelta
 import warnings
+import sys
+import os
+from pathlib import Path
 warnings.filterwarnings('ignore')
+
+# 添加配置路径
+sys.path.append(str(Path(__file__).parent.parent / 'config'))
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -18,15 +24,58 @@ logger = logging.getLogger(__name__)
 class HiveDataLoader:
     """Hive数据加载器类，专门用于地质灾害监测数据"""
     
-    def __init__(self, hive_connection=None):
+    def __init__(self, hive_connection=None, config_name=None, config_dict=None, use_env=False):
         """
         初始化Hive数据加载器
         
         Args:
             hive_connection: Hive连接对象 (可选，如果没有则使用模拟数据)
+            config_name: 预定义配置名称 (local, production, kerberos, development)
+            config_dict: 配置字典
+            use_env: 是否使用环境变量
         """
         self.hive_conn = hive_connection
         self.table_info = self._get_table_info()
+        
+        # 如果没有直接传入连接对象，尝试通过配置创建连接
+        if not self.hive_conn:
+            self.hive_conn = self._create_hive_connection(config_name, config_dict, use_env)
+    
+    def _create_hive_connection(self, config_name=None, config_dict=None, use_env=False):
+        """
+        创建Hive连接
+        
+        Args:
+            config_name: 预定义配置名称
+            config_dict: 配置字典
+            use_env: 是否使用环境变量
+            
+        Returns:
+            Hive连接对象或None
+        """
+        try:
+            # 尝试导入配置模块
+            from hive_config import get_hive_connection
+            
+            connection = get_hive_connection(
+                config_name=config_name,
+                config_dict=config_dict,
+                use_env=use_env
+            )
+            
+            if connection:
+                logger.info("成功创建Hive连接")
+                return connection
+            else:
+                logger.warning("创建Hive连接失败，将使用模拟数据")
+                return None
+                
+        except ImportError:
+            logger.warning("无法导入hive_config模块，将使用模拟数据")
+            return None
+        except Exception as e:
+            logger.error(f"创建Hive连接异常: {e}")
+            return None
         
     def _get_table_info(self) -> Dict:
         """获取表信息配置"""

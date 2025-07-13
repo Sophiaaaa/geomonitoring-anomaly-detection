@@ -1,0 +1,114 @@
+# Hive连接配置环境变量模板
+# 复制此文件为 .env 并填写实际的连接信息
+
+# =================================
+# Hive连接基础配置
+# =================================
+
+# Hive服务器地址
+HIVE_HOST=localhost
+
+# Hive服务器端口 (默认10000)
+HIVE_PORT=10000
+
+# 数据库名称
+HIVE_DATABASE=default
+
+# 用户名和密码
+HIVE_USERNAME=
+HIVE_PASSWORD=
+
+# 认证机制: PLAIN, NOSASL, KERBEROS
+HIVE_AUTH_MECHANISM=PLAIN
+
+# Kerberos服务名称 (当使用KERBEROS认证时)
+HIVE_KERBEROS_SERVICE_NAME=hive
+
+# =================================
+# 生产环境配置示例
+# =================================
+
+# 生产环境Hive集群
+# HIVE_HOST=hive-cluster.company.com
+# HIVE_PORT=10000
+# HIVE_DATABASE=geological_monitoring
+# HIVE_USERNAME=monitoring_user
+# HIVE_PASSWORD=your_secure_password
+# HIVE_AUTH_MECHANISM=PLAIN
+
+# =================================
+# 开发环境配置示例
+# =================================
+
+# 开发环境Hive
+# HIVE_HOST=dev-hive.company.com
+# HIVE_PORT=10000
+# HIVE_DATABASE=dev_geological_monitoring
+# HIVE_USERNAME=dev_user
+# HIVE_PASSWORD=dev_password
+# HIVE_AUTH_MECHANISM=PLAIN
+
+# =================================
+# Kerberos认证环境配置示例
+# =================================
+
+# 安全集群配置
+# HIVE_HOST=secure-hive.company.com
+# HIVE_PORT=10000
+# HIVE_DATABASE=geological_monitoring
+# HIVE_USERNAME=monitoring_user
+# HIVE_AUTH_MECHANISM=KERBEROS
+# HIVE_KERBEROS_SERVICE_NAME=hive
+
+# =================================
+# 连接池配置
+# =================================
+
+# 连接池大小
+HIVE_CONNECTION_POOL_SIZE=10
+
+# 连接超时时间 (秒)
+HIVE_CONNECTION_TIMEOUT=30
+
+# 重试次数
+HIVE_CONNECTION_RETRY=3
+
+# =================================
+# 日志配置
+# =================================
+
+# 日志级别: DEBUG, INFO, WARNING, ERROR
+LOG_LEVEL=INFO
+
+# 日志文件路径
+LOG_FILE=hive_connection.log
+
+# =================================
+# 数据加载配置
+# =================================
+
+# 默认数据加载时间范围 (天)
+DEFAULT_DATA_DAYS=30
+
+# 批量加载大小
+BATCH_SIZE=10000
+
+# 数据缓存开关
+ENABLE_DATA_CACHE=true
+
+# 缓存目录
+CACHE_DIR=./cache
+
+# =================================
+# 使用说明
+# =================================
+
+# 1. 复制此文件为 .env: cp hive_env_template.txt .env
+# 2. 填写实际的连接信息
+# 3. 在代码中使用: from config.hive_config import get_hive_connection
+# 4. 创建连接: conn = get_hive_connection(use_env=True)
+
+# 注意: 
+# - 不要将包含敏感信息的 .env 文件提交到版本控制
+# - 在生产环境中使用更安全的密码管理方式
+# - 定期更新密码和认证信息 
