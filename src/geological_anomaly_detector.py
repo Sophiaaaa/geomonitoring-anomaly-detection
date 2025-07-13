@@ -278,6 +278,15 @@ class GeologicalAnomalyDetector:
         
         df = feature_matrix.copy()
         
+        # 获取用于训练的特征列（与训练时一致）
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        exclude_cols = ['monitor_point_code', 'create_time_s']
+        # 排除所有异常相关的列，确保与训练时特征集一致
+        numeric_cols = [col for col in numeric_cols if col not in exclude_cols 
+                       and not col.endswith('_anomaly') 
+                       and not col.endswith('_score')
+                       and col != 'anomaly_score']
+        
         # 计算每种方法的异常分数
         for method, results in anomaly_results.items():
             if method in self.models:
@@ -285,21 +294,37 @@ class GeologicalAnomalyDetector:
                 
                 # 获取异常分数
                 if hasattr(model, 'decision_function'):
-                    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-                    exclude_cols = ['monitor_point_code', 'create_time_s']
-                    numeric_cols = [col for col in numeric_cols if col not in exclude_cols and not col.endswith('_anomaly')]
-                    
-                    X = df[numeric_cols].fillna(df[numeric_cols].median())
-                    scores = model.decision_function(X)
-                    
-                    # 标准化分数到0-1范围
-                    scores_normalized = (scores - scores.min()) / (scores.max() - scores.min())
-                    df[f'{method}_score'] = scores_normalized
+                    try:
+                        X = df[numeric_cols].fillna(df[numeric_cols].median())
+                        scores = model.decision_function(X)
+                        
+                        # 标准化分数到0-1范围
+                        if scores.max() != scores.min():
+                            scores_normalized = (scores - scores.min()) / (scores.max() - scores.min())
+                        else:
+                            scores_normalized = np.zeros_like(scores)
+                        df[f'{method}_score'] = scores_normalized
+                    except Exception as e:
+                        logger.warning(f"计算{method}异常分数失败: {e}")
+                        # 使用二元异常结果作为分数
+                        df[f'{method}_score'] = (results == -1).astype(float)
+                        
                 elif hasattr(model, 'negative_outlier_factor_'):
                     # LOF的情况
-                    scores = -model.negative_outlier_factor_
-                    scores_normalized = (scores - scores.min()) / (scores.max() - scores.min())
-                    df[f'{method}_score'] = scores_normalized
+                    try:
+                        scores = -model.negative_outlier_factor_
+                        if scores.max() != scores.min():
+                            scores_normalized = (scores - scores.min()) / (scores.max() - scores.min())
+                        else:
+                            scores_normalized = np.zeros_like(scores)
+                        df[f'{method}_score'] = scores_normalized
+                    except Exception as e:
+                        logger.warning(f"计算{method}异常分数失败: {e}")
+                        # 使用二元异常结果作为分数
+                        df[f'{method}_score'] = (results == -1).astype(float)
+                else:
+                    # 其他情况直接使用二元异常结果
+                    df[f'{method}_score'] = (results == -1).astype(float)
         
         # 计算综合异常分数
         score_cols = [col for col in df.columns if col.endswith('_score')]
