@@ -17,7 +17,7 @@ class HiveConnectionConfig:
     """Hive连接配置数据类"""
     host: str
     port: int = 10000
-    database: str = "default"
+    database: str = ""
     username: Optional[str] = None
     password: Optional[str] = None
     auth_mechanism: str = "PLAIN"  # PLAIN, NOSASL, KERBEROS
