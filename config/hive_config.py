@@ -269,7 +269,7 @@ HIVE_CONFIGS = {
         host="localhost",
         port=10000,
         database="default",
-        username=None,
+        username='hdfs',
         password=None,
         auth_mechanism="PLAIN"
     ),
@@ -279,8 +279,8 @@ HIVE_CONFIGS = {
         host="hive-cluster.example.com",
         port=10000,
         database="geological_monitoring",
-        username="monitoring_user",
-        password="your_password",
+        username="hdfs",
+        password=None,
         auth_mechanism="PLAIN"
     ),
     
@@ -289,7 +289,7 @@ HIVE_CONFIGS = {
         host="secure-hive.example.com",
         port=10000,
         database="geological_monitoring",
-        username="monitoring_user",
+        username="hdfs",
         auth_mechanism="KERBEROS",
         kerberos_service_name="hive"
     ),
@@ -299,8 +299,8 @@ HIVE_CONFIGS = {
         host="dev-hive.example.com",
         port=10000,
         database="dev_geological_monitoring",
-        username="dev_user",
-        password="dev_password",
+        username="hdfs",
+        password=None,
         auth_mechanism="PLAIN"
     )
 }
@@ -346,8 +346,8 @@ if __name__ == "__main__":
     config_dict = {
         "host": "localhost",
         "port": 10000,
-        "database": "default",
-        "username": None,
+        "database": "wz_data_quality_dwd",
+        "username": 'hdfs',
         "password": None
     }
     conn = get_hive_connection(config_dict=config_dict)
