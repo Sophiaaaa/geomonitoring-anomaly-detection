@@ -1,0 +1,64 @@
+# 研究区域配置文件
+regions:
+  # 华北平原监测区域
+  north_china_plain:
+    name: "华北平原"
+    geometry:
+      type: "rectangle"
+      bounds: [114.0, 34.0, 120.0, 40.0]  # [west, south, east, north]
+    description: "华北平原地质灾害监测区域"
+    data_sources:
+      - modis_lst
+      - gvlm_imagery
+      - field_measurements
+    
+  # 四川盆地监测区域
+  sichuan_basin:
+    name: "四川盆地"
+    geometry:
+      type: "rectangle"
+      bounds: [102.0, 28.0, 108.0, 32.0]
+    description: "四川盆地地质灾害高发区"
+    data_sources:
+      - modis_lst
+      - gvlm_imagery
+    
+  # 长江三角洲监测区域
+  yangtze_delta:
+    name: "长江三角洲"
+    geometry:
+      type: "rectangle"
+      bounds: [118.0, 30.0, 122.0, 32.5]
+    description: "长江三角洲城市群监测区域"
+    data_sources:
+      - modis_lst
+      - field_measurements
+
+# 数据处理参数
+processing_params:
+  # 时间范围
+  time_range:
+    start_date: "2020-01-01"
+    end_date: "2023-12-31"
+  
+  # 空间分辨率
+  spatial_resolution:
+    modis_lst: 1000  # 米
+    gvlm_imagery: 0.59  # 米
+  
+  # 时间分辨率
+  temporal_resolution:
+    modis_lst: "daily"
+    field_measurements: "hourly"
+  
+  # 异常检测参数
+  anomaly_detection:
+    contamination: 0.1  # 异常值比例
+    n_estimators: 100   # 孤立森林参数
+    stl_seasonal: 7     # STL分解季节周期
+
+# 输出配置
+output_config:
+  figure_format: "png"
+  figure_dpi: 300
+  report_format: "html" 

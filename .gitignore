@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+build/
+*.egg-info/
+
+# OS
+.DS_Store
+._*
+
+# Log files
+*.log
+*.out
+
+# Data files (large files)
+*.csv
+*.parquet
+*.pkl
+*.pickle
+
+# Model files
+*.model
+*.joblib
+*.sav
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Virtual environments
+venv/
+env/
+ENV/
