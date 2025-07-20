@@ -1,3 +1,103 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from sklearn.metrics import mean_squared_error
+
+# 加载数据
+def load_data(file_path):
+    df = pd.read_csv(file_path)
+    df['create_time_s'] = pd.to_datetime(df['create_time_s'])
+    df = df.set_index('create_time_s')
+    return df
+
+# 数据预处理
+def preprocess_data(df):
+    # 处理缺失值
+    df['value'] = df['value'].fillna(method='ffill').fillna(method='bfill')
+
+    # 检测并处理异常值（使用3σ原则）
+    mean = df['value'].mean()
+    std = df['value'].std()
+    df['value'] = np.where(np.abs(df['value'] - mean) > 3 * std, mean, df['value'])
+
+    return df
+
+# 时间序列分解
+def decompose_time_series(df, period=24):
+    from statsmodels.tsa.seasonal import seasonal_decompose
+    result = seasonal_decompose(df['value'], model='multiplicative', period=period)
+    result.plot()
+    plt.show()
+    return result
+
+# 异常检测
+def detect_anomalies(df, window=24, threshold=3):
+    df['rolling_mean'] = df['value'].rolling(window=window).mean()
+    df['rolling_std'] = df['value'].rolling(window=window).std()
+
+    df['z_score'] = (df['value'] - df['rolling_mean']) / df['rolling_std']
+    df['anomaly'] = np.where(np.abs(df['z_score']) > threshold, 1, 0)
+
+    # 绘制异常点
+    plt.figure(figsize=(12, 6))
+    plt.plot(df.index, df['value'], label='Value')
+    anomalies = df[df['anomaly'] == 1]
+    plt.scatter(anomalies.index, anomalies['value'], color='red', label='Anomalies')
+    plt.legend()
+    plt.title('Detected Anomalies')
+    plt.show()
+
+    return df
+
+# 预测建模
+def build_forecast_model(df, steps=24):
+    # 训练模型
+    model = SARIMAX(df['value'], order=(1, 1, 1), seasonal_order=(1, 1, 1, 24))
+    results = model.fit(disp=False)
+
+    # 进行预测
+    forecast = results.get_forecast(steps=steps)
+    pred_mean = forecast.predicted_mean
+    pred_ci = forecast.conf_int()
+
+    # 绘制预测结果
+    plt.figure(figsize=(12, 6))
+    plt.plot(df.index[-100:], df['value'][-100:], label='Observed')
+    plt.plot(pred_mean.index, pred_mean, label='Forecast', color='r')
+    plt.fill_between(pred_ci.index, pred_ci.iloc[:, 0], pred_ci.iloc[:, 1], color='pink', alpha=0.3)
+    plt.legend()
+    plt.title('Time Series Forecast')
+    plt.show()
+
+    return results, pred_mean
+
+# 主分析流程
+def main():
+    # 加载和预处理数据
+    df = load_data('mud_monitor_cement_location.csv')
+    df = preprocess_data(df)
+
+    # 时间序列分解
+    decomposition = decompose_time_series(df)
+
+    # 异常检测
+    df_anomalies = detect_anomalies(df)
+
+    # 预测建模
+    model, forecast = build_forecast_model(df)
+
+    # 输出异常点
+    anomalies = df_anomalies[df_anomalies['anomaly'] == 1]
+    print("Detected anomalies:")
+    print(anomalies[['value', 'anomaly']])
+
+    # 输出预测结果
+    print("\nForecast results:")
+    print(forecast)
+
+if __name__ == "__main__":
+    main()
 """
 Hive数据加载模块
 负责从Hive数据库加载7张地质灾害监测数据表

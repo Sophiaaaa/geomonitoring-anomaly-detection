@@ -12,10 +12,10 @@ HIVE_HOST=localhost
 HIVE_PORT=10000
 
 # 数据库名称
-HIVE_DATABASE=default
+HIVE_DATABASE=wz_data_quality_dwd
 
 # 用户名和密码
-HIVE_USERNAME=
+HIVE_USERNAME=hdfs
 HIVE_PASSWORD=
 
 # 认证机制: PLAIN, NOSASL, KERBEROS
@@ -27,14 +27,6 @@ HIVE_KERBEROS_SERVICE_NAME=hive
 # =================================
 # 生产环境配置示例
 # =================================
-
-# 生产环境Hive集群
-# HIVE_HOST=hive-cluster.company.com
-# HIVE_PORT=10000
-# HIVE_DATABASE=geological_monitoring
-# HIVE_USERNAME=monitoring_user
-# HIVE_PASSWORD=your_secure_password
-# HIVE_AUTH_MECHANISM=PLAIN
 
 # =================================
 # 开发环境配置示例
@@ -107,8 +99,3 @@ CACHE_DIR=./cache
 # 2. 填写实际的连接信息
 # 3. 在代码中使用: from config.hive_config import get_hive_connection
 # 4. 创建连接: conn = get_hive_connection(use_env=True)
-
-# 注意: 
-# - 不要将包含敏感信息的 .env 文件提交到版本控制
-# - 在生产环境中使用更安全的密码管理方式
-# - 定期更新密码和认证信息 
